@@ -1,0 +1,9 @@
+examples/**
+dataset/**
+
+.vscode
+.idea
+*.pyc
+__*
+*.tmp
+*.lock
