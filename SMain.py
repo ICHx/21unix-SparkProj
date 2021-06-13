@@ -10,12 +10,18 @@ from pyspark.ml.feature import Tokenizer
 from pyspark.ml.feature import Word2Vec
 
 DEBUG = True
+fig = None
+result= None
 
 
-def main():
+def main(fname="/history"):
+    global result
+    
     print(f"Hello world, decoding {fname}")
+    print("Last changed: 13:13")
     spark = SparkSession.builder\
         .appName("MyProj")\
+        .master("local[*]")\
         .getOrCreate()
 
     df = spark.read.text(fname, wholetext=False)
@@ -36,37 +42,45 @@ def main():
     wds = result.select("token").collect()
     vecs = result.select("vector").collect()
 
-    plotVecs(wds, vecs, result.count())
+    cnt = result.count()
+    plotVecs(fname, wds, vecs, cnt)
 
     # clean
     result.show()
+    print(f"count= {cnt}")
     spark.stop()
     return
 
 
-def plotVecs(wds, vecs, count):
+def plotVecs(fname, wds, vecs, count):
+    global fig
     fig = plt.figure()
+
     ax = fig.add_subplot(111, projection='3d')
 
     for i in range(count):
         label = str(wds[i][0])
         coords = vecs[i][0].toArray()
         ax.scatter(*coords)
-        ax.text(*coords, label)
+        
+        if(i%10 ==0):
+            ax.text(*coords, label)
+        pass
 
-    plt.show()
-    oname= fname.replace("/","").replace(":","")
+    oname = fname.replace("/", "").replace(":", "")
     # oname= fname.split("/")[-1]
     plt.savefig(f"/opt/spark/myProj/plots/out-{oname}.png")
+
+    # plt.show()
+    
+    
     pass
 
 
 if __name__ == '__main__':
-    global fname
     print(sys.argv)
     if len(sys.argv) < 2:
-        fname = "hdfs://zuk:9000/history"
+        main("hdfs://zuk:9000/history")
     else:
-        fname = sys.argv[-1]
-
-    main()
+        fname = sys.argv[1]
+        main(fname)
