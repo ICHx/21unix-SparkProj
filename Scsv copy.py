@@ -58,18 +58,17 @@ def main(fname="hdfs://zuk:9000/dataset/twitter/Tweets.csv"):
     vecs1 = Result.select("vector")\
         .filter("airline_sentiment = \"positive\" OR airline_sentiment = \"neutral\"")\
         .collect()
-    cnt1 = len(vecs1)
-    
-    
+
     #? negative
     wds2 = Result.select("rtoken")\
-        .filter(removed.airline_sentiment == "negative")\
+        .filter(Result.airline_sentiment == "negative")\
         .collect()
     vecs2 = Result.select("vector")\
-        .filter(removed.airline_sentiment == "negative")\
+        .filter(Result.airline_sentiment == "negative")\
         .collect()
 
 
+    cnt1 = len(vecs1)
     cnt2 = len(vecs2)
     plotVecs(oname+"pos1", wds1, vecs1, cnt1, "red")
     plotVecs(oname+"neg1", wds2, vecs2, cnt2, "blue")
@@ -96,7 +95,7 @@ def plotVecs(oname, wds, vecs, count, color):
     ax.set_zlabel("z")
 
     for i in range(count):
-        coords = vecs[i][0]
+        coords = vecs[i][0].toArray()
         ax.scatter(*coords, c=color)
         pass
 
@@ -105,8 +104,7 @@ def plotVecs(oname, wds, vecs, count, color):
     # ax.text(*coords, label)
 
     plt.savefig(f"/opt/spark/myProj/plots/out-{oname}.png")
-    plt.close()
-    return fig # in jupyter
+    return fig  # in jupyter
 
 
 def plotBothVecs(oname, wds, vecs, count, color, wds2, vecs2, count2, color2):
@@ -119,13 +117,13 @@ def plotBothVecs(oname, wds, vecs, count, color, wds2, vecs2, count2, color2):
     ax.set_zlabel("z")
 
     for i in range(count):
-        coords = vecs[i][0]
+        coords = vecs[i][0].toArray()
         ax.scatter(*coords, c=color)
         pass
     
     for i in range(count2):
-        coords = vecs2[i][0]
-        ax.scatter(*coords, c=color2)
+        coords = vecs2[i][0].toArray()
+        ax.scatter(*coords, c=color)
         pass
 
     # too much too slow and crowded, disabled
@@ -133,8 +131,7 @@ def plotBothVecs(oname, wds, vecs, count, color, wds2, vecs2, count2, color2):
     # ax.text(*coords, label)
 
     plt.savefig(f"/opt/spark/myProj/plots/out-{oname}.png")
-    plt.close()
-    return fig # in jupyter
+    return fig  # in jupyter
 
 
 if __name__ == '__main__':
