@@ -8,9 +8,11 @@ numpy = "*"
 matplotlib = "*"
 jupyter = "*"
 ipympl = "*"
+kiwisolver = "*"
+pyspark = "*"
+pylint = "*"
 
 [dev-packages]
 pylint = "*"
 
 [requires]
-python_version = "3.8"
